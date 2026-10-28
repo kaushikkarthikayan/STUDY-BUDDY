@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-3"><i class="bi bi-easel"></i> Teacher Dashboard <small class="text-muted fs-6">CSE-A · DBMS</small></h2>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="card card-body stat"><span class="text-muted small">Students</span><span class="fs-3 fw-bold">{{ students|length }}</span></div></div>
+  <div class="col-6 col-md-3"><div class="card card-body stat"><span class="text-muted small">Class average</span><span class="fs-3 fw-bold">{{ avg }}%</span></div></div>
+  <div class="col-6 col-md-3"><div class="card card-body stat"><span class="text-muted small">Need help</span><span class="fs-3 fw-bold text-danger">{{ students|selectattr('score','lt',60)|list|length }}</span></div></div>
+  <div class="col-6 col-md-3"><div class="card card-body stat"><span class="text-muted small">Live quiz attempts</span><span class="fs-3 fw-bold">{{ real|length }}</span></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card"><div class="card-body">
+      <h5>Students</h5>
+      <table class="table align-middle">
+        <thead><tr><th>Name</th><th>Score</th><th>Weak topics</th></tr></thead>
+        <tbody>
+        {% for s in students %}
+        <tr><td>{{ s.name }}</td>
+          <td style="width:40%"><div class="d-flex align-items-center gap-2"><div class="progress flex-grow-1" style="height:8px"><div class="progress-bar {{ 'bg-danger' if s.score < 60 else 'bg-success' }}" style="width: {{ s.score }}%"></div></div><small>{{ s.score }}%</small></div></td>
+          <td>{{ s.weak }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p class="small text-muted mb-0">Sample class data for the demo.</p>
+    </div></div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card mb-4"><div class="card-body">
+      <h5>Weak topics from live quizzes</h5>
+      {% if class_weak %}
+      <ul class="list-group list-group-flush">{% for w in class_weak %}<li class="list-group-item d-flex justify-content-between"><span>{{ w.subtopic }} <small class="text-muted">({{ w.topic }})</small></span><span class="badge bg-danger">{{ w.pct }}%</span></li>{% endfor %}</ul>
+      {% else %}<p class="text-muted mb-0">No weak topics recorded yet.</p>{% endif %}
+    </div></div>
+    <div class="card"><div class="card-body">
+      <h5>Recent attempts</h5>
+      {% if real %}
+      <ul class="list-group list-group-flush">{% for r in real %}<li class="list-group-item d-flex justify-content-between"><span>{{ r.student }} · {{ r.topic }}</span><span>{{ r.score }}/{{ r.total }}</span></li>{% endfor %}</ul>
+      {% else %}<p class="text-muted mb-0">No attempts yet.</p>{% endif %}
+      <a href="{{ url_for('notices') }}" class="btn btn-sm btn-outline-primary mt-3"><i class="bi bi-megaphone"></i> Post a notice</a>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

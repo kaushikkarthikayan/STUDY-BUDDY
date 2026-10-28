@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero p-4 p-md-5 mb-4">
+  <h1 class="display-6 fw-bold">Study smarter, not longer.</h1>
+  <p class="lead mb-4">Study Buddy turns any topic into exam-ready notes and quizzes, finds your weak topics, and builds a plan to fix them.</p>
+  <a href="{{ url_for('notes') }}" class="btn btn-light btn-lg me-2 mb-2"><i class="bi bi-journal-text"></i> Make notes</a>
+  <a href="{{ url_for('quiz') }}" class="btn btn-outline-light btn-lg mb-2"><i class="bi bi-patch-question"></i> Take a quiz</a>
+  {% if not ai_on %}<p class="small mt-3 mb-0 opacity-75"><i class="bi bi-info-circle"></i> Demo mode: AI key not set, so sample content is shown.</p>{% endif %}
+</section>
+
+<div class="row g-3 mb-4">
+  {% set cards = [
+    ('notes','bi-journal-text','Smart Notes','Paste a chapter or type a topic and get summary, key points and keywords.'),
+    ('quiz','bi-patch-question','AI MCQs','5 fresh questions on any topic, tagged by subtopic.'),
+    ('plan','bi-calendar-check','Study Plan','A 7-day plan built from the subtopics you got wrong.'),
+    ('rescue','bi-life-preserver','Rescue Zone','Quick help for your weakest topics before the exam.'),
+    ('arena','bi-trophy','Class Arena','Quiz battles between classes, plus peer matching.'),
+    ('teacher','bi-easel','Teacher Dashboard','See class scores and the topics students struggle with.'),
+  ] %}
+  {% for ep, icon, title, text in cards %}
+  <div class="col-md-4 col-sm-6">
+    <a href="{{ url_for(ep) }}" class="card feature h-100 text-decoration-none">
+      <div class="card-body">
+        <i class="bi {{ icon }} fs-2 text-primary"></i>
+        <h5 class="mt-2">{{ title }}</h5>
+        <p class="text-muted mb-0">{{ text }}</p>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h5><i class="bi bi-exclamation-triangle text-warning"></i> Your weak topics</h5>
+      {% if weak %}
+        <ul class="list-group list-group-flush">
+        {% for w in weak %}<li class="list-group-item d-flex justify-content-between"><span>{{ w.subtopic }} <small class="text-muted">({{ w.topic }})</small></span><span class="badge bg-danger">{{ w.pct }}%</span></li>{% endfor %}
+        </ul>
+        <a href="{{ url_for('plan') }}" class="btn btn-sm btn-primary mt-3">See my study plan</a>
+      {% else %}
+        <p class="text-muted mb-0">No weak topics yet. You've taken {{ attempts }} quiz{{ '' if attempts == 1 else 'zes' }}. Take one to find out where to focus.</p>
+      {% endif %}
+    </div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h5><i class="bi bi-megaphone text-primary"></i> Latest notices</h5>
+      <ul class="list-group list-group-flush">
+      {% for n in notices %}<li class="list-group-item"><strong>{{ n.title }}</strong><br><small class="text-muted">{{ n.posted_by }} · {{ n.created_at[:10] }}</small></li>{% endfor %}
+      </ul>
+      <a href="{{ url_for('notices') }}" class="btn btn-sm btn-outline-primary mt-3">All notices</a>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

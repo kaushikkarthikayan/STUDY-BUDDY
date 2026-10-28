@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Rescue Zone{% endblock %}
+{% block content %}
+<h2 class="mb-1"><i class="bi bi-life-preserver"></i> Rescue Zone</h2>
+<p class="text-muted mb-4">Exam tomorrow? Fix your weakest topics first, in 15-minute bursts.</p>
+{% if weak %}
+<div class="row g-3">
+  {% for w in weak %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 border-danger"><div class="card-body">
+      <span class="badge bg-danger mb-2">{{ w.pct }}% correct</span>
+      <h5>{{ w.subtopic }}</h5>
+      <p class="small text-muted">{{ w.topic }}</p>
+      <form method="post" action="{{ url_for('notes') }}" class="d-inline">
+        <input type="hidden" name="topic" value="{{ w.subtopic }} ({{ w.topic }})">
+        <button class="btn btn-sm btn-primary">Quick notes</button>
+      </form>
+      <a href="{{ url_for('quiz', topic=w.subtopic ~ ' in ' ~ w.topic) }}" class="btn btn-sm btn-outline-primary">Re-test</a>
+    </div></div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty text-center p-5"><p class="text-muted">Nothing to rescue yet. Take a quiz and we'll show your weakest topics here.</p><a href="{{ url_for('quiz') }}" class="btn btn-primary">Take a quiz</a></div>
+{% endif %}
+{% endblock %}

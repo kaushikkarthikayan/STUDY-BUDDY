@@ -1,0 +1,14 @@
+:root { --sb-primary: #4f46e5; --sb-dark: #312e81; }
+body { background: #f5f6fb; }
+.sb-nav { background: linear-gradient(90deg, var(--sb-dark), var(--sb-primary)); }
+.hero { background: linear-gradient(135deg, var(--sb-primary), #7c3aed); color: #fff; border-radius: 1rem; }
+.card { border: none; border-radius: .9rem; box-shadow: 0 2px 10px rgba(30, 27, 75, .06); }
+.feature { transition: transform .15s, box-shadow .15s; color: inherit; }
+.feature:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(30, 27, 75, .12); }
+.feature h5 { color: #1e1b4b; }
+.btn-primary { background: var(--sb-primary); border-color: var(--sb-primary); }
+.text-primary { color: var(--sb-primary) !important; }
+.empty { background: #fff; border: 2px dashed #d6d8ea; border-radius: 1rem; }
+.stat span:last-child { line-height: 1.2; }
+.medal-1 { color: #f5b301; } .medal-2 { color: #9ca3af; } .medal-3 { color: #c2703d; }
+@media print { nav, footer, form, .btn { display: none !important; } }

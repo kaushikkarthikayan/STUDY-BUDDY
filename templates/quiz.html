@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Quiz: {{ quiz.topic }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Quiz: {{ quiz.topic }}</h2>
+  <span class="badge {{ 'bg-success' if quiz.source == 'gemini' else 'bg-secondary' }}">{{ 'AI generated' if quiz.source == 'gemini' else 'Sample questions' }}</span>
+</div>
+<form method="post">
+  <div class="mb-3" style="max-width:320px">
+    <input name="student" class="form-control" placeholder="Your name (for Class Arena)">
+  </div>
+  {% for q in questions %}{% set qi = loop.index0 %}
+  <div class="card mb-3"><div class="card-body">
+    <p class="fw-semibold mb-1">Q{{ loop.index }}. {{ q.question }}</p>
+    <p class="small text-muted mb-2">{{ q.subtopic }}</p>
+    {% for opt in q.options %}
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="q{{ qi }}" id="q{{ qi }}o{{ loop.index0 }}" value="{{ loop.index0 }}" required>
+      <label class="form-check-label" for="q{{ qi }}o{{ loop.index0 }}">{{ opt }}</label>
+    </div>
+    {% endfor %}
+  </div></div>
+  {% endfor %}
+  <button class="btn btn-primary btn-lg"><i class="bi bi-check2-circle"></i> Submit answers</button>
+</form>
+{% endblock %}

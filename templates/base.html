@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Study Buddy{% endblock %} · Study Buddy</title>
+  <link href="{{ url_for('static', filename='vendor/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark sb-nav">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ url_for('home') }}"><i class="bi bi-mortarboard-fill"></i> Study Buddy</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        {% set links = [('notes','Smart Notes'),('quiz','AI Quiz'),('plan','Study Plan'),('rescue','Rescue Zone'),('arena','Class Arena'),('teacher','Teacher'),('notices','Notices')] %}
+        {% for ep, label in links %}
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith(ep) %}active{% endif %}" href="{{ url_for(ep) }}">{{ label }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</nav>
+<main class="container py-4">
+  {% block content %}{% endblock %}
+</main>
+<footer class="text-center text-muted small py-4">Study Buddy · Team 404 hackathon prototype</footer>
+<script src="{{ url_for('static', filename='vendor/bootstrap.bundle.min.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

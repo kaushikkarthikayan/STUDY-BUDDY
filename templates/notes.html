@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Smart Notes{% endblock %}
+{% block content %}
+<h2 class="mb-3"><i class="bi bi-journal-text"></i> Smart Notes</h2>
+<div class="row g-4">
+  <div class="col-lg-5">
+    <form method="post" class="card card-body" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').innerText='Writing notes...'">
+      <label class="form-label fw-semibold">Topic</label>
+      <input name="topic" class="form-control mb-3" placeholder="e.g. Normalization in DBMS" value="{{ topic }}" required>
+      <label class="form-label fw-semibold">Your material <span class="text-muted fw-normal">(optional)</span></label>
+      <textarea name="text" rows="7" class="form-control mb-3" placeholder="Paste a paragraph from your textbook or lecture notes">{{ text }}</textarea>
+      <button class="btn btn-primary"><i class="bi bi-stars"></i> Generate notes</button>
+    </form>
+  </div>
+  <div class="col-lg-7">
+    {% if result %}
+    <div class="card"><div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <h4>{{ topic }}</h4>
+        <span class="badge {{ 'bg-success' if result.source == 'gemini' else 'bg-secondary' }}">{{ 'AI generated' if result.source == 'gemini' else 'Sample notes' }}</span>
+      </div>
+      <p>{{ result.summary }}</p>
+      <h6 class="mt-3">Key points</h6>
+      <ul>{% for p in result.key_points %}<li>{{ p }}</li>{% endfor %}</ul>
+      {% if result.keywords %}
+      <h6 class="mt-3">Keywords</h6>
+      <dl class="row mb-0">{% for k in result.keywords %}<dt class="col-sm-4">{{ k.term }}</dt><dd class="col-sm-8">{{ k.meaning }}</dd>{% endfor %}</dl>
+      {% endif %}
+      {% if result.exam_tip %}<div class="alert alert-info mt-3 mb-3"><i class="bi bi-lightbulb"></i> <strong>Exam tip:</strong> {{ result.exam_tip }}</div>{% endif %}
+      <a href="{{ url_for('quiz', topic=topic) }}" class="btn btn-success"><i class="bi bi-patch-question"></i> Quiz me on this</a>
+      <button class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+    </div></div>
+    {% else %}
+    <div class="empty text-center text-muted p-5">
+      <i class="bi bi-stars fs-1"></i>
+      <p class="mt-2">Type a topic and Study Buddy will write a summary, key points, keywords and an exam tip.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
