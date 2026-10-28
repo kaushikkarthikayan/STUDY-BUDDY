@@ -7,6 +7,7 @@
   <link href="{{ url_for('static', filename='vendor/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='vendor/bootstrap-icons.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark sb-nav">
@@ -17,7 +18,7 @@
       <ul class="navbar-nav ms-auto">
         {% set links = [('notes','Smart Notes'),('quiz','AI Quiz'),('plan','Study Plan'),('rescue','Rescue Zone'),('arena','Class Arena'),('teacher','Teacher'),('notices','Notices')] %}
         {% for ep, label in links %}
-        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith(ep) %}active{% endif %}" href="{{ url_for(ep) }}">{{ label }}</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and (request.endpoint == ep or (ep == 'quiz' and request.endpoint == 'take_quiz')) %}active{% endif %}" href="{{ url_for(ep) }}">{{ label }}</a></li>
         {% endfor %}
       </ul>
     </div>

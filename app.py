@@ -271,9 +271,40 @@ def rescue():
     return render_template("rescue.html", weak=weak)
 
 
+@app.route("/demo-data", methods=["POST"])
+def demo_data():
+    """Fill in a sample quiz history so the plan and dashboards have something to show."""
+    db = get_db()
+    sample = [("DBMS", "Normalization", 0), ("DBMS", "Normalization", 1), ("DBMS", "Joins", 0),
+              ("DBMS", "Keys", 1), ("DBMS", "Transactions", 0), ("Python basics", "Loops", 1),
+              ("Python basics", "Functions", 0), ("Python basics", "Lists", 1)]
+    db.executemany("INSERT INTO answers (quiz_id, topic, subtopic, correct) VALUES (0,?,?,?)", sample)
+    db.executemany("INSERT INTO attempts (quiz_id, student, topic, score, total) VALUES (0,?,?,?,?)",
+                   [("Demo student", "DBMS", 2, 5), ("Demo student", "Python basics", 2, 3)])
+    db.commit()
+    return redirect(request.form.get("next") or url_for("plan"))
+
+
 @app.route("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "ai_key_set": bool(os.environ.get("GEMINI_API_KEY"))}
+
+
+@app.route("/health/ai")
+def health_ai():
+    """Make one tiny Gemini call to check the key works (never shows the key)."""
+    reply = ai._ask_gemini("Reply with the single word: ok", want_json=False)
+    return {"ai_working": bool(reply), **ai.last_status}
+
+
+@app.errorhandler(404)
+def not_found(_e):
+    return render_template("error.html", code=404, message="We couldn't find that page."), 404
+
+
+@app.errorhandler(500)
+def server_error(_e):
+    return render_template("error.html", code=500, message="Something went wrong on our side. Please try again."), 500
 
 
 if __name__ == "__main__":

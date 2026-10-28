@@ -42,6 +42,7 @@
         <a href="{{ url_for('plan') }}" class="btn btn-sm btn-primary mt-3">See my study plan</a>
       {% else %}
         <p class="text-muted mb-0">No weak topics yet. You've taken {{ attempts }} quiz{{ '' if attempts == 1 else 'zes' }}. Take one to find out where to focus.</p>
+        <div class="mt-3"><a href="{{ url_for('quiz') }}" class="btn btn-sm btn-primary">Take a quiz</a> <span class="small">{% include "_demo_button.html" %}</span></div>
       {% endif %}
     </div></div>
   </div>

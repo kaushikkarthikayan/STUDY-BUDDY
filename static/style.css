@@ -12,3 +12,6 @@ body { background: #f5f6fb; }
 .stat span:last-child { line-height: 1.2; }
 .medal-1 { color: #f5b301; } .medal-2 { color: #9ca3af; } .medal-3 { color: #c2703d; }
 @media print { nav, footer, form, .btn { display: none !important; } }
+.btn-outline-primary { color: var(--sb-primary); border-color: var(--sb-primary); }
+.btn-outline-primary:hover { background: var(--sb-primary); border-color: var(--sb-primary); color: #fff; }
+a { color: var(--sb-primary); }

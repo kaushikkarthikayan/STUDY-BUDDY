@@ -1,0 +1,4 @@
+<form method="post" action="{{ url_for('demo_data') }}" class="d-inline">
+  <input type="hidden" name="next" value="{{ request.path }}">
+  <button class="btn btn-sm btn-outline-secondary">Load sample results</button>
+</form>

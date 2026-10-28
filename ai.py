@@ -9,26 +9,52 @@ import re
 
 import requests
 
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+# Try the chosen model first, then fall back to other Flash models if Google
+# has renamed or retired it.
+MODELS = [m for m in [os.environ.get("GEMINI_MODEL", "").strip(),
+                      "gemini-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash"] if m]
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+last_status = {"ok": None, "model": None, "error": None}
 
 
-def _ask_gemini(prompt):
+def _ask_gemini(prompt, want_json=True):
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not key:
+        last_status.update(ok=False, model=None, error="GEMINI_API_KEY not set")
         return None
-    try:
-        resp = requests.post(
-            GEMINI_URL.format(model=GEMINI_MODEL),
-            params={"key": key},
-            json={"contents": [{"parts": [{"text": prompt}]}]},
-            timeout=40,
-        )
-        resp.raise_for_status()
-        return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
-    except Exception as exc:  # network error, bad key, quota, etc.
-        print("Gemini call failed:", exc)
-        return None
+    config = {"thinkingConfig": {"thinkingBudget": 0}}  # faster replies
+    if want_json:
+        config["responseMimeType"] = "application/json"
+    for model in MODELS:
+        for cfg in (config, {}):  # older models reject thinkingConfig
+            try:
+                # key goes in a header so it never shows up in logged URLs
+                resp = requests.post(
+                    GEMINI_URL.format(model=model),
+                    headers={"x-goog-api-key": key},
+                    json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": cfg},
+                    timeout=45,
+                )
+            except requests.RequestException as exc:
+                last_status.update(ok=False, model=model, error=type(exc).__name__)
+                print("Gemini call failed:", model, type(exc).__name__)
+                return None
+            if resp.ok:
+                try:
+                    text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+                except (KeyError, IndexError, ValueError):
+                    last_status.update(ok=False, model=model, error="empty reply")
+                    return None
+                last_status.update(ok=True, model=model, error=None)
+                return text
+            last_status.update(ok=False, model=model, error=f"HTTP {resp.status_code}")
+            print("Gemini call failed:", model, resp.status_code, resp.text[:200])
+            if resp.status_code == 400 and cfg:
+                continue  # retry this model without the extra config
+            break
+        if resp.status_code != 404:
+            return None  # bad key, quota, etc: another model won't help
+    return None
 
 
 def _extract_json(text):
