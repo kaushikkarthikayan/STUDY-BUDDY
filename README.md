@@ -4,6 +4,8 @@ Study Buddy is an AI-powered learning platform that creates smart notes, practic
 
 _Team 404 hackathon prototype._
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/kaushikkarthikayan/STUDY-BUDDY)
+
 **Features:** Smart Notes (AI), AI MCQ quizzes, weak-topic detection, 7-day study plan,
 Rescue Zone, Class Arena + peer matching, Teacher Dashboard, College Notices.
 
