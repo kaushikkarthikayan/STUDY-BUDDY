@@ -17,7 +17,7 @@ percentage correct per subtopic across all quizzes. Any subtopic below **60%** i
 feeds the Study Plan and Rescue Zone.
 
 ## AI model
-Google Gemini (`gemini-flash-latest`, falling back to `gemini-2.5-flash` and `gemini-2.0-flash`; set `GEMINI_MODEL` to choose another). Visit `/health/ai` to check the key works.
+Google Gemini (`gemini-2.5-flash`, then other free Flash models if one is unavailable or out of quota; set `GEMINI_MODEL` to choose another). Visit `/health/ai` to check the key works.
 Without a `GEMINI_API_KEY` the app runs in demo mode with sample notes and questions.
 
 ## Run on your computer

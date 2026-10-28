@@ -10,11 +10,14 @@ import re
 import requests
 
 # Try the chosen model first, then fall back to other Flash models if Google
-# has renamed or retired it.
+# has renamed or retired one, or its free-tier quota is used up (each model
+# has its own quota).
 MODELS = [m for m in [os.environ.get("GEMINI_MODEL", "").strip(),
-                      "gemini-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash"] if m]
+                      "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-latest",
+                      "gemini-flash-lite-latest", "gemini-2.0-flash", "gemini-2.0-flash-lite"] if m]
+RETRY_NEXT_MODEL = {404, 429, 503}  # not found, quota used up, overloaded
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-last_status = {"ok": None, "model": None, "error": None}
+last_status = {"ok": None, "model": None, "error": None, "tried": {}}
 
 
 def _ask_gemini(prompt, want_json=True):
@@ -22,6 +25,7 @@ def _ask_gemini(prompt, want_json=True):
     if not key:
         last_status.update(ok=False, model=None, error="GEMINI_API_KEY not set")
         return None
+    last_status["tried"] = {}
     config = {"thinkingConfig": {"thinkingBudget": 0}}  # faster replies
     if want_json:
         config["responseMimeType"] = "application/json"
@@ -46,14 +50,16 @@ def _ask_gemini(prompt, want_json=True):
                     last_status.update(ok=False, model=model, error="empty reply")
                     return None
                 last_status.update(ok=True, model=model, error=None)
+                last_status["tried"][model] = 200
                 return text
             last_status.update(ok=False, model=model, error=f"HTTP {resp.status_code}")
+            last_status["tried"][model] = resp.status_code
             print("Gemini call failed:", model, resp.status_code, resp.text[:200])
             if resp.status_code == 400 and cfg:
                 continue  # retry this model without the extra config
             break
-        if resp.status_code != 404:
-            return None  # bad key, quota, etc: another model won't help
+        if resp.status_code not in RETRY_NEXT_MODEL:
+            return None  # bad key etc: another model won't help
     return None
 
 
